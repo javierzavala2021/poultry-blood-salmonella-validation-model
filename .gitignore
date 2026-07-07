@@ -1,0 +1,67 @@
+# ==========================================
+# 1. PYTHON & VIRTUAL ENVIRONMENT
+# ==========================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments (ignore all standard names)
+venv/
+env/
+.env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# 2. DJANGO & DATABASE
+# ==========================================
+# Log files
+*.log
+local_settings.py
+
+# Django project specific (located in the 'backend' folder)
+backend/db.sqlite3
+backend/db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+backend/tmp/
+
+# ==========================================
+# 3. ENVIRONMENT VARIABLES & SECRETS
+# ==========================================
+.env
+.env.local
+.env.development
+.env.production
+*.secret
+
+# ==========================================
+# 4. MACHINE LEARNING & TEMPORARY UPLOADS
+# ==========================================
+# Ignore temporary CSV/Excel datasets uploaded by users during batch validation
+backend/*.csv
+backend/*.xlsx
+backend/temp_uploads/
+backend/uploaded_datasets/
+
+# Machine Learning models are often large and should not be tracked in Git.
+# Your project loads 'salmonella_xgboost_model.pkl'.
+*.pkl
+*.joblib
+*.model
+
+# ==========================================
+# 5. OS & EDITOR JUNK
+# ==========================================
+# Mac / Windows system files
+.DS_Store
+Thumbs.db
+
+# VS Code / PyCharm / IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo

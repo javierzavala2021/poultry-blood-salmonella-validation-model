@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +20,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6u=lkz0%^*xmtjvlo^-&l6l+x2gec&f0(rn11_fl9ow1ijzw3m'
+# Uses Render's secret variable in production, falls back to your local key during development
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 
+    'django-insecure-6u=lkz0%^*xmtjvlo^-&l6l+x2gec&f0(rn11_fl9ow1ijzw3m'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Automatically turns DEBUG False when running on Render's servers
+DEBUG = 'RENDER' not in os.environ
 
+# Automatically allows your Render domain (e.g., 'salmonella-validator.onrender.com')
 ALLOWED_HOSTS = []
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+else:
+    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
 
 
 # Application definition
@@ -37,10 +48,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'predictor'
+    'predictor',
 ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise must sit directly below SecurityMiddleware to serve CSS/JS in production!
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,6 +68,7 @@ ROOT_URLCONF = 'mywebsite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Preserved your custom frontend folder path!
         'DIRS': [BASE_DIR.parent / 'frontend'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -115,6 +130,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Preserved your custom local static folder path!
 STATICFILES_DIRS = [
     BASE_DIR.parent / 'static',
 ]
+
+# This is where WhiteNoise gathers all static files during your Render deployment build
+STATIC_ROOT = os.path.join(BASE_DIR.parent, 'staticfiles')
+
+# Tells WhiteNoise to compress and cache your CSS/JS for maximum production speed
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

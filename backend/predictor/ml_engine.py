@@ -12,19 +12,15 @@ model_path = os.path.join(settings.BASE_DIR, 'models', 'salmonella_xgboost_model
 
 # Print out the exact resolved path to the Render logs so we can verify it!
 print(f"DEBUG: BASE_DIR is -> {settings.BASE_DIR}")
-print(f"DEBUG: Attempting to load model from -> {model_path}")
+print("DEBUG: Files inside BASE_DIR ->", os.listdir(settings.BASE_DIR))
+
+models_folder = os.path.join(settings.BASE_DIR, 'models')
+if os.path.exists(models_folder):
+    print("DEBUG: The 'models' folder EXISTS! Files inside ->", os.listdir(models_folder))
+else:
+    print("DEBUG: The 'models' folder DOES NOT EXIST on the Render server!")
 
 
-try:
-    model = joblib.load(model_path)
-    print("SUCCESS: Machine Learning model loaded perfectly!")
-except Exception as e:
-    model = None
-    print("CRITICAL ML ERROR DETECTED:")
-    traceback.print_exc()
-    print("An unexpected error occurred: The Machine Learning model is currently unavailable.")
-
-    
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [
     'container Material',     

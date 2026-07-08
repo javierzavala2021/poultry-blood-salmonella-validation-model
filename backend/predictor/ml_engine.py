@@ -8,7 +8,7 @@ import traceback
 
 # 1. LOAD THE MODEL GLOBALLY
 # Let Python handle the slashes by separating 'models' and the filename
-model_path = os.path.join(settings.BASE_DIR, 'models', 'salmonella_xgboost_model.pkl')
+model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model.pkl')
 model = None
 
 # Print out the exact resolved path to the Render logs so we can verify it!

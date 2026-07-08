@@ -4,6 +4,8 @@ import pandas as pd
 from django.conf import settings
 from sklearn.metrics import mean_absolute_error, r2_score
 
+import traceback
+
 # 1. LOAD THE MODEL GLOBALLY
 # By loading it here outside of a function, Django only loads the heavy 
 # XGBoost model once when the server starts, making predictions lightning fast!
@@ -13,7 +15,9 @@ try:
     model = joblib.load(model_path)
 except Exception as e:
     model = None
-    print(f"⚠️ Critical Error loading XGBoost model: {e}")
+    print("CRITICAL ML ERROR DETECTED:")
+    traceback.print_exc()
+    print("An unexpected error occurred: The Machine Learning model is currently unavailable.")
 
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [

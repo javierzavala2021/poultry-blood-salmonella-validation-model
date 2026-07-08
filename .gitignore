@@ -22,5 +22,5 @@ Thumbs.db
 
 # IMPORTANT: We ignore .pkl files globally, BUT whitelist our specific model folder
 *.pkl
-!backend/models/*.pkl
-!models/*.pkl
+!backend/Models/*.pkl
+!Models/*.pkl

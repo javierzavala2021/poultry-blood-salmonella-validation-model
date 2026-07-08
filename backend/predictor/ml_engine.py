@@ -7,18 +7,24 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import traceback
 
 # 1. LOAD THE MODEL GLOBALLY
-# By loading it here outside of a function, Django only loads the heavy 
-# XGBoost model once when the server starts, making predictions lightning fast!
-model_path = os.path.join(settings.BASE_DIR, 'models/salmonella_xgboost_model.pkl')
+# Let Python handle the slashes by separating 'models' and the filename
+model_path = os.path.join(settings.BASE_DIR, 'models', 'salmonella_xgboost_model.pkl')
+
+# Print out the exact resolved path to the Render logs so we can verify it!
+print(f"DEBUG: BASE_DIR is -> {settings.BASE_DIR}")
+print(f"DEBUG: Attempting to load model from -> {model_path}")
+
 
 try:
     model = joblib.load(model_path)
+    print("SUCCESS: Machine Learning model loaded perfectly!")
 except Exception as e:
     model = None
     print("CRITICAL ML ERROR DETECTED:")
     traceback.print_exc()
     print("An unexpected error occurred: The Machine Learning model is currently unavailable.")
 
+    
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [
     'container Material',     

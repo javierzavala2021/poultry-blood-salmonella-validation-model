@@ -9,6 +9,7 @@ import traceback
 # 1. LOAD THE MODEL GLOBALLY
 # Let Python handle the slashes by separating 'models' and the filename
 model_path = os.path.join(settings.BASE_DIR, 'models', 'salmonella_xgboost_model.pkl')
+model = None
 
 # Print out the exact resolved path to the Render logs so we can verify it!
 print(f"DEBUG: BASE_DIR is -> {settings.BASE_DIR}")
@@ -20,6 +21,12 @@ if os.path.exists(models_folder):
 else:
     print("DEBUG: The 'models' folder DOES NOT EXIST on the Render server!")
 
+try:
+    model = joblib.load(model_path)
+    print(f"DEBUG: Loaded model from {model_path}")
+except Exception as e:
+    model = None
+    print(f"ERROR: Failed to load model from {model_path}: {e}")
 
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [

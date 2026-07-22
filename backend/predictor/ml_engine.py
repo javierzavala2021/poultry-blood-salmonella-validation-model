@@ -10,7 +10,7 @@ import traceback
 # Let Python handle the slashes by separating 'models' and the filename.
 # (Standardized to lowercase 'models' to prevent Linux case-sensitive crashes)
 original_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_1.pkl')
-synthetic_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_1.pkl')
+synthetic_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2.pkl')
 
 model_original = None
 model_synthetic = None

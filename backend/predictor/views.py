@@ -15,6 +15,7 @@ def home(request):
     if request.method == 'POST':
         # --- TRAFFIC COP: Which form was submitted? ---
         prediction_type = request.POST.get('prediction_type')
+        model_choice = request.POST.get('model_choice', None)  # Default to None if not provided
 
         # ---------------------------------------------------------
         # ROUTE 1: SINGLE PREDICTION
@@ -24,11 +25,11 @@ def home(request):
                 # 1. THE GATEKEEPER: Check inputs before they hit the Bouncer
                 temp = request.POST.get('temp')
                 time = request.POST.get('time')
-                count = request.POST.get('starting_count')
+                count = request.POST.get('starting_count')  
 
                 # Reject empty fields explicitly
                 if not temp or not time or not count:
-                    raise ValueError("All fields are required. Please fill in temperature, time, and initial count.")
+                    raise ValueError("" if not temp else "" + f"{'Temperature is missing. ' if not temp else ''}" + f"{'Time is missing. ' if not time else ''}" + f"{'Initial count is missing. ' if not count else ''}")
                 
                 # Reject impossible negative values explicitly
                 if float(temp) < 0: 
@@ -37,6 +38,8 @@ def home(request):
                     raise ValueError("Time cannot be negative.")
                 if float(count) < 0: 
                     raise ValueError("Initial cell count cannot be negative.")
+                if float(count) > 10:
+                    raise ValueError("Initial cell count is unusually high, the Max is 10. Please check your input.")
 
                 # 2. THE BOUNCER: Clean the single HTML input
                 clean_df = singleChecker.clean_single_input(request.POST)
@@ -47,7 +50,7 @@ def home(request):
                 
                 # --- NEW BIOLOGICAL SURVIVAL LOGIC STARTS HERE ---
                 # A. Get the raw prediction from your machine learning engine
-                raw_pred = ml_engine.get_single_prediction(clean_df)
+                raw_pred = ml_engine.get_single_prediction(clean_df, model_choice)
                 
                 # Handle whether your ML engine returns a single float or a list/array [float]
                 if isinstance(raw_pred, (list, tuple)):
@@ -166,7 +169,7 @@ def home(request):
 
 
                 # 6. THE SCIENTIST (PREDICTION): Predict all the rows
-                predictions = ml_engine.get_batch_predictions(clean_df)
+                predictions = ml_engine.get_batch_predictions(clean_df, model_choice)
                 clean_df['Predicted Survival (Log CFU/g)'] = predictions
                 
                 # If we calculated deviations, add them as a column right next to the predictions!

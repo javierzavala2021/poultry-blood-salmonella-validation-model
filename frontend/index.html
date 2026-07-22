@@ -24,11 +24,13 @@
                 <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
                 <p class="text-sm text-slate-600"> This tool predicts the survival of Salmonella in poultry blood products based on temperature, time, and other factors.</p>
             </div>
-
             <section>
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                         
+                        <!-- ========================================== -->
+                        <!-- 1. SINGLE PREDICTION CARD                  -->
+                        <!-- ========================================== -->
                         <div id="single-card" class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 mb-4 border-b border-slate-200 pb-3">
@@ -73,13 +75,24 @@
                                         </select>
                                     </div>
 
+                                    <div class="form-group mt-3 mb-3">
+                                        <label for="single_model_choice" class="block text-xs font-medium text-slate-500 mb-1">Select Prediction Engine:</label>
+                                        <select name="model_choice" id="single_model_choice" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition bg-white" required>
+                                            <option value="synthetic" selected>Expanded Synthetic Model (Recommended)</option>
+                                            <option value="original">Original Data Model (Legacy)</option>
+                                        </select>
+                                        <small class="text-[10px] text-slate-400 mt-1 block leading-tight">
+                                            The Expanded model handles extreme bacterial counts better, while the Legacy model strictly follows the original dataset.
+                                        </small>
+                                    </div>
+
                                     <button type="submit" class="w-full mt-2 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition shadow-sm">
                                         <i data-lucide="loader-2" class="w-4 h-4 animate-spin htmx-indicator" id="single-spinner"></i>
                                         <span class="button-text">Calculate Survival</span>
                                     </button>
                                 </form>
                             </div>
-
+                            
                             <div>
                                 {% if final_count is not None %}
                                 <div class="mt-4 p-5 rounded-2xl border transition-all duration-300 shadow-sm {% if is_killed %}bg-emerald-50 border-emerald-200 text-emerald-950{% else %}bg-rose-50 border-rose-200 text-rose-950{% endif %}">
@@ -112,6 +125,10 @@
                                 {% endif %}
                             </div>
                         </div>
+
+                        <!-- ========================================== -->
+                        <!-- 2. BATCH UPLOAD CARD                       -->
+                        <!-- ========================================== -->
                         <div id="batch-card" class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 mb-4 border-b border-slate-200 pb-3">
@@ -120,13 +137,24 @@
                                 </div>
 
                                 <p class="text-xs text-slate-500 mb-4">Upload a dataset for mass validation. Requires <span class="font-semibold text-slate-700">Temp</span>, <span class="font-semibold text-slate-700">Time</span>, and <span class="font-semibold text-slate-700">Cell Count</span> columns.</p>
-
+                                
                                 <form hx-post="/" hx-target="#batch-card" hx-select="#batch-card" hx-swap="outerHTML" hx-encoding="multipart/form-data" hx-indicator="#batch-spinner" class="space-y-4">
                                     {% csrf_token %}
                                     <input type="hidden" name="prediction_type" value="batch">
-                                    
+
                                     <input type="file" name="dataset" accept=".csv" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200 cursor-pointer bg-white" required>
                                     
+                                    <div class="form-group mt-3 mb-3">
+                                        <label for="batch_model_choice" class="block text-xs font-medium text-slate-500 mb-1">Select Prediction Engine:</label>
+                                        <select name="model_choice" id="batch_model_choice" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-sm focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition bg-white" required>
+                                            <option value="synthetic" selected>Expanded Synthetic Model (Recommended)</option>
+                                            <option value="original">Original Data Model (Legacy)</option>
+                                        </select>
+                                        <small class="text-[10px] text-slate-400 mt-1 block leading-tight">
+                                            Apply this model to all rows in your uploaded CSV dataset.
+                                        </small>
+                                    </div>
+
                                     <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-emerald-700 transition shadow-sm">
                                         <i data-lucide="loader-2" class="w-4 h-4 animate-spin htmx-indicator" id="batch-spinner"></i>
                                         <span class="button-text">Process Dataset</span>
@@ -164,6 +192,7 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="prediction_type" value="batch">
                                         <input type="hidden" name="saved_file_path" value="{{ temporary_file_path }}">
+                                        <input type="hidden" name="model_choice" value="{{ model_choice|default:'synthetic' }}">
                                         
                                         <div class="grid grid-cols-2 gap-2">
                                             <div>
@@ -232,7 +261,7 @@
 
                             </div>
                         </div>
-                        </div>
+                    </div>
                     <div class="flex flex-wrap items-center gap-3 mt-5 pt-4 border-t border-slate-200">
                         <div class="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
                             <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
@@ -242,6 +271,306 @@
                 </div>
             </section>
             
+            <!-- ========================================== -->
+            <!-- MODEL STATISTICS SECTION                   -->
+            <!-- ========================================== -->
+            <section class="mt-8">
+                <style>
+                    /* Streaming chunk for stats CSS */
+                    .model-stats-wrapper {
+                        max-width: 800px;
+                        margin: 25px auto;
+                        padding: 25px;
+                        background-color: #ffffff;
+                        border-radius: 16px;
+                        border: 1px solid #e2e8f0;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                        color: #334155;
+                    }
+
+                    .model-stats-wrapper h3 {
+                        text-align: center;
+                        color: #0f172a;
+                        margin-top: 0;
+                        margin-bottom: 20px;
+                        font-size: 1.25rem;
+                        border-bottom: 1px solid #f1f5f9;
+                        padding-bottom: 15px;
+                    }
+
+                    .stats-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                        gap: 15px;
+                        margin-bottom: 25px;
+                    }
+
+                    .stat-card {
+                        background: #f8fafc;
+                        padding: 15px;
+                        border-radius: 12px;
+                        text-align: center;
+                        border: 1px solid #f1f5f9;
+                        transition: all 0.2s;
+                    }
+
+                    .stat-card h4 {
+                        margin: 0;
+                        font-size: 1.5rem;
+                        color: #2563eb;
+                    }
+
+                    .stat-card p {
+                        margin: 4px 0 0 0;
+                        font-size: 0.75rem;
+                        color: #64748b;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                    }
+
+                    .feature-importance-section h4 {
+                        font-size: 1rem;
+                        color: #0f172a;
+                        margin-bottom: 12px;
+                    }
+
+                    .feature-list {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+                    }
+
+                    .feature-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px 15px;
+                        background: #f8fafc;
+                        margin-bottom: 6px;
+                        border-radius: 8px;
+                        border: 1px solid #f1f5f9;
+                        font-size: 0.85rem;
+                    }
+
+                    .feature-name {
+                        font-weight: 500;
+                        color: #334155;
+                        min-width: 130px;
+                    }
+
+                    .feature-bar-container {
+                        flex-grow: 1;
+                        margin: 0 15px;
+                        background-color: #e2e8f0;
+                        height: 6px;
+                        border-radius: 3px;
+                        overflow: hidden;
+                    }
+
+                    .feature-bar {
+                        height: 100%;
+                        background-color: #3b82f6;
+                        border-radius: 3px;
+                        transition: width 0.5s ease;
+                    }
+
+                    .feature-value {
+                        font-weight: 600;
+                        color: #2563eb;
+                        min-width: 50px;
+                        text-align: right;
+                    }
+
+                    /* Toggle Button CSS */
+                    .toggle-container {
+                        display: flex;
+                        justify-content: center;
+                        margin-bottom: 25px;
+                    }
+
+                    .view-toggle-btn {
+                        background-color: #f1f5f9;
+                        border: 1px solid #cbd5e1;
+                        color: #475569;
+                        padding: 8px 20px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+
+                    .view-toggle-btn:first-child {
+                        border-radius: 8px 0 0 8px;
+                    }
+
+                    .view-toggle-btn:last-child {
+                        border-radius: 0 8px 8px 0;
+                        border-left: none;
+                    }
+
+                    .view-toggle-btn.active {
+                        background-color: #2563eb;
+                        color: white;
+                        border-color: #2563eb;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+                    }
+
+                    /* Expanded data specific styling */
+                    .expanded-theme .stat-card h4, .expanded-theme .feature-value { color: #059669; }
+                    .expanded-theme .feature-bar { background-color: #10b981; }
+                    #btn-synthetic.active {
+                        background-color: #10b981;
+                        border-color: #10b981;
+                    }
+                    
+                    .data-view {
+                        display: none;
+                        animation: fadeIn 0.3s ease-in-out;
+                    }
+
+                    .data-view.active-view {
+                        display: block;
+                    }
+
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(-5px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                </style>
+
+                <div class="model-stats-wrapper">
+                    <h3>XGBoost Regressor Model Performance</h3>
+
+                    <!-- TOGGLE BUTTONS -->
+                    <div class="toggle-container">
+                        <button id="btn-original" class="view-toggle-btn active" onclick="switchDataset('original')">Original Data Model</button>
+                        <button id="btn-synthetic" class="view-toggle-btn" onclick="switchDataset('synthetic')">Expanded (Synthetic) Data</button>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- ORIGINAL MODEL VIEW (Active by default)    -->
+                    <!-- ========================================== -->
+                    <div id="view-original" class="data-view active-view">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>0.5566</h4>
+                                <p>Mean Squared Error</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9992</h4>
+                                <p>Training R² Score</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9138</h4>
+                                <p>Testing R² Score</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-importance-section">
+                            <h4>Feature Importance (Weight)</h4>
+                            <ul class="feature-list">
+                                <li class="feature-item">
+                                    <span class="feature-name">Time (Min)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 43.8%;"></div></div>
+                                    <span class="feature-value">43.8%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Temp (°C)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 24.5%;"></div></div>
+                                    <span class="feature-value text-red-500">24.5% </span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Starting Cell Count</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 15.5%;"></div></div>
+                                    <span class="feature-value">15.5%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">How Submerged</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 12.3%;"></div></div>
+                                    <span class="feature-value">12.3%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Container Material</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 4.0%;"></div></div>
+                                    <span class="feature-value">4.0%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- SYNTHETIC MODEL VIEW (Hidden initially)    -->
+                    <!-- ========================================== -->
+                    <div id="view-synthetic" class="data-view expanded-theme">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>0.1428</h4>
+                                <p>Mean Squared Error</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9854</h4>
+                                <p>Training R² Score</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9754</h4>
+                                <p>Testing R² Score</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-importance-section">
+                            <h4>Feature Impact (SHAP Truth Metric)</h4>
+                            <ul class="feature-list">
+                                <li class="feature-item">
+                                    <span class="feature-name">Time (Min)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 37.8%;"></div></div>
+                                    <span class="feature-value">37.8%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Starting Cell Count</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 31.4%;"></div></div>
+                                    <span class="feature-value">31.4%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Temp (°C)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 16.2%;"></div></div>
+                                    <span class="feature-value">16.2%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">How Submerged</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 8.7%;"></div></div>
+                                    <span class="feature-value">8.7%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Container Material</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 5.9%;"></div></div>
+                                    <span class="feature-value">5.9%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function switchDataset(datasetName) {
+                        // 1. Remove active class from all buttons and views
+                        document.getElementById('btn-original').classList.remove('active');
+                        document.getElementById('btn-synthetic').classList.remove('active');
+                        document.getElementById('view-original').classList.remove('active-view');
+                        document.getElementById('view-synthetic').classList.remove('active-view');
+
+                        // 2. Add active class to the clicked button and corresponding view
+                        if (datasetName === 'original') {
+                            document.getElementById('btn-original').classList.add('active');
+                            document.getElementById('view-original').classList.add('active-view');
+                        } else {
+                            document.getElementById('btn-synthetic').classList.add('active');
+                            document.getElementById('view-synthetic').classList.add('active-view');
+                        }
+                    }
+                </script>
+            </section>
         </div>
 
         <script>

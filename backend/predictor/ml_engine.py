@@ -11,9 +11,11 @@ import traceback
 # (Standardized to lowercase 'models' to prevent Linux case-sensitive crashes)
 original_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_1.pkl')
 synthetic_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2.pkl')
+broth_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_3.pkl')
 
 model_original = None
 model_synthetic = None
+model_broth = None
 
 # Print out the exact resolved path to the Render logs so we can verify it!
 print(f"DEBUG: BASE_DIR is -> {settings.BASE_DIR}")
@@ -39,6 +41,13 @@ try:
 except Exception as e:
     print(f"ERROR: Failed to load Synthetic model from {synthetic_model_path}: {e}")
 
+# Load Broth Model
+try:
+    model_broth = joblib.load(broth_model_path)
+    print(f"DEBUG: Loaded Broth model from {broth_model_path}")
+except Exception as e:
+    print(f"ERROR: Failed to load Broth model from {broth_model_path}: {e}")
+
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [
     'container Material',     
@@ -55,8 +64,12 @@ def get_single_prediction(clean_df,model_choice):
 
     if model_choice == 'original':
         model = model_original
-    else:
+    elif model_choice == 'synthetic':
         model = model_synthetic
+    elif model_choice == 'Broth_data':
+        model = model_broth
+    else:
+        raise ValueError(f"Invalid model choice: {model_choice}")
 
     if model is None:
         raise ValueError(f"The {model_choice} model failed to load on the server.")
@@ -81,8 +94,12 @@ def get_batch_predictions(clean_df, model_choice):
 
     if model_choice == 'original':
         model = model_original
-    else:
+    elif model_choice == 'synthetic':
         model = model_synthetic
+    elif model_choice == 'Broth_data':
+        model = model_broth
+    else:
+        raise ValueError(f"Invalid model choice: {model_choice}")
 
     if model is None:
         raise ValueError(f"The {model_choice} model failed to load on the server.")
@@ -105,8 +122,12 @@ def evaluate_model_accuracy(clean_df, actuals_column_name='Cell Count(Log CFU/g)
 
     if model_choice == 'original':
         model = model_original
-    else:
+    elif model_choice == 'synthetic':
         model = model_synthetic
+    elif model_choice == 'Broth_data':
+        model = model_broth
+    else:
+        raise ValueError(f"Invalid model choice: {model_choice}")
 
     if model is None:
             raise ValueError(f"The {model_choice} model failed to load on the server.")

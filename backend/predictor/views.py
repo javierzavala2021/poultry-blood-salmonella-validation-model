@@ -27,20 +27,30 @@ def home(request):
                 time = request.POST.get('time')
                 count = request.POST.get('starting_count')  
 
+                invalid_fields = False
+                invalid_messages = []
+
                 # Reject empty fields explicitly
                 if not temp or not time or not count:
                     raise ValueError("" if not temp else "" + f"{'Temperature is missing. ' if not temp else ''}" + f"{'Time is missing. ' if not time else ''}" + f"{'Initial count is missing. ' if not count else ''}")
                 
                 # Reject impossible negative values explicitly
                 if float(temp) < 0: 
-                    raise ValueError("Temperature cannot be negative.")
+                    invalid_fields = True
+                    invalid_messages.append("Temperature cannot be negative. ")
                 if float(time) < 0: 
-                    raise ValueError("Time cannot be negative.")
-                if float(count) < 0: 
-                    raise ValueError("Initial cell count cannot be negative.")
-                if float(count) > 10:
-                    raise ValueError("Initial cell count is unusually high, the Max is 10. Please check your input.")
+                    invalid_fields = True
+                    invalid_messages.append("Time cannot be negative. ")
 
+                if float(count) < 0: 
+                    invalid_fields = True
+                    invalid_messages.append("Initial cell count cannot be negative.")
+                if float(count) > 10:
+                    invalid_fields = True
+                    invalid_messages.append("Initial cell count is unusually high, the Max is 10. Please check your input.")
+
+                if invalid_fields:
+                    raise ValueError("".join(invalid_messages))
                 # 2. THE BOUNCER: Clean the single HTML input
                 clean_df = singleChecker.clean_single_input(request.POST)
 

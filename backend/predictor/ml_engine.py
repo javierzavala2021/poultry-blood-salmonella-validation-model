@@ -12,10 +12,14 @@ import traceback
 original_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_1.pkl')
 synthetic_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2.pkl')
 broth_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_3.pkl')
+two_percent_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2_percent_Fat.pkl')
+data_cocktail_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_cocktail.pkl')
 
 model_original = None
 model_synthetic = None
 model_broth = None
+model_two_percent = None
+model_data_cocktail = None
 
 # Print out the exact resolved path to the Render logs so we can verify it!
 print(f"DEBUG: BASE_DIR is -> {settings.BASE_DIR}")
@@ -48,6 +52,20 @@ try:
 except Exception as e:
     print(f"ERROR: Failed to load Broth model from {broth_model_path}: {e}")
 
+# Load 2% Fat Model
+try:
+    model_two_percent = joblib.load(two_percent_model_path)
+    print(f"DEBUG: Loaded 2% Fat model from {two_percent_model_path}")
+except Exception as e:
+    print(f"ERROR: Failed to load 2% Fat model from {two_percent_model_path}: {e}")
+
+# Load Data Cocktail Model
+try:
+    model_data_cocktail = joblib.load(data_cocktail_model_path)
+    print(f"DEBUG: Loaded Data Cocktail model from {data_cocktail_model_path}")
+except Exception as e:
+    print(f"ERROR: Failed to load Data Cocktail model from {data_cocktail_model_path}: {e}")
+
 # The exact 5 columns the model expects to see
 EXPECTED_FEATURES = [
     'container Material',     
@@ -66,8 +84,12 @@ def get_single_prediction(clean_df,model_choice):
         model = model_original
     elif model_choice == 'synthetic':
         model = model_synthetic
-    elif model_choice == 'Broth_data':
+    elif model_choice == 'broth':
         model = model_broth
+    elif model_choice == 'two_percent':
+        model = model_two_percent
+    elif model_choice == 'cocktail':
+        model = model_data_cocktail
     else:
         raise ValueError(f"Invalid model choice: {model_choice}")
 
@@ -96,8 +118,12 @@ def get_batch_predictions(clean_df, model_choice):
         model = model_original
     elif model_choice == 'synthetic':
         model = model_synthetic
-    elif model_choice == 'Broth_data':
+    elif model_choice == 'broth':
         model = model_broth
+    elif model_choice == 'two_percent':
+        model = model_two_percent
+    elif model_choice == 'cocktail':
+        model = model_data_cocktail
     else:
         raise ValueError(f"Invalid model choice: {model_choice}")
 
@@ -124,8 +150,12 @@ def evaluate_model_accuracy(clean_df, actuals_column_name='Cell Count(Log CFU/g)
         model = model_original
     elif model_choice == 'synthetic':
         model = model_synthetic
-    elif model_choice == 'Broth_data':
+    elif model_choice == 'broth':
         model = model_broth
+    elif model_choice == 'two_percent':
+        model = model_two_percent
+    elif model_choice == 'cocktail':
+        model = model_data_cocktail
     else:
         raise ValueError(f"Invalid model choice: {model_choice}")
 

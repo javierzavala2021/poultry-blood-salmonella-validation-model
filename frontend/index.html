@@ -78,7 +78,9 @@
                                     <div class="form-group mt-3 mb-3">
                                         <label for="single_model_choice" class="block text-xs font-medium text-slate-500 mb-1">Select Prediction Engine:</label>
                                         <select name="model_choice" id="single_model_choice" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition bg-white" required>
-                                            <option value="Broth_data" selected>Simulated + Broth Model (Best Performance)</option>
+                                            <option value="cocktail" selected>Data Cocktail Model (Most Robust Engine)</option>
+                                            <option value="broth">Simulated + Broth Model</option>
+                                            <option value="two_percent">FSIS 2% Fat Model</option>
                                             <option value="synthetic">Expanded Synthetic Model</option>
                                             <option value="original">Original Data Model (Legacy)</option>
                                         </select>
@@ -148,9 +150,11 @@
                                     <div class="form-group mt-3 mb-3">
                                         <label for="batch_model_choice" class="block text-xs font-medium text-slate-500 mb-1">Select Prediction Engine:</label>
                                         <select name="model_choice" id="batch_model_choice" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-sm focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition bg-white" required>
-                                            <option value="synthetic" selected>Expanded Synthetic Model (Recommended)</option>
+                                            <option value="cocktail" selected>Data Cocktail Model (Most Robust Engine)</option>
+                                            <option value="broth">Simulated + Broth Model</option>
+                                            <option value="two_percent">FSIS 2% Fat Model</option>
+                                            <option value="synthetic">Expanded Synthetic Model</option>
                                             <option value="original">Original Data Model (Legacy)</option>
-                                            <option value="Broth_data">Expanded Synthetic With Broth Data Model</option>
                                         </select>
                                         <small class="text-[10px] text-slate-400 mt-1 block leading-tight">
                                             Apply this model to all rows in your uploaded CSV dataset.
@@ -273,7 +277,7 @@
                 </div>
             </section>
             
-            
+                    
             <!-- ========================================== -->
             <!-- MODEL STATISTICS SECTION                   -->
             <!-- ========================================== -->
@@ -404,46 +408,56 @@
                         transition: all 0.2s ease;
                     }
 
-                    .view-toggle-btn:first-child {
-                        border-radius: 8px 0 0 8px;
-                    }
-
-                    .view-toggle-btn:not(:first-child) {
-                        border-left: none;
-                    }
-
-                    .view-toggle-btn:last-child {
-                        border-radius: 0 8px 8px 0;
-                        border-left: none;
-                    }
-
                     .view-toggle-btn.active {
-                        background-color: #2563eb;
+                        background-color: #2563eb; /* Default Blue for Original */
                         color: white;
                         border-color: #2563eb;
-                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
                     }
 
                     /* ========================================== */
-                    /* Expanded (Synthetic) Data Theme - GREEN    */
+                    /* Synthetic Data Theme - GREEN               */
                     /* ========================================== */
-                    .expanded-theme .stat-card h4, .expanded-theme .feature-value { color: #059669; }
-                    .expanded-theme .feature-bar { background-color: #10b981; }
+                    .synthetic-theme .stat-card h4, .synthetic-theme .feature-value { color: #059669; }
+                    .synthetic-theme .feature-bar { background-color: #10b981; }
                     #btn-synthetic.active {
                         background-color: #10b981;
+                        color: white;
                         border-color: #10b981;
                     }
 
                     /* ========================================== */
                     /* Simulated + Broth Data Theme - AMBER/ORANGE*/
                     /* ========================================== */
-                    .broth-theme .stat-card h4, .broth-theme .feature-value { color: #b60715; } 
-                    .broth-theme .feature-bar { background-color: #b60715; } 
-                    #btn-Broth.active {
-                        background-color: #b60715; 
-                        border-color: #b60715;
+                    .broth-theme .stat-card h4, .broth-theme .feature-value { color: #d97706; } /* Tailwind Amber-600 */
+                    .broth-theme .feature-bar { background-color: #f59e0b; } /* Tailwind Amber-500 */
+                    #btn-broth.active {
+                        background-color: #f59e0b; /* Tailwind Amber-500 */
+                        color: white;
+                        border-color: #f59e0b;
                     }
 
+                    /* ========================================== */
+                    /* 2% Fat Data Theme - PURPLE                 */
+                    /* ========================================== */
+                    .fat-theme .stat-card h4, .fat-theme .feature-value { color: #7c3aed; } /* Tailwind Violet-600 */
+                    .fat-theme .feature-bar { background-color: #8b5cf6; } /* Tailwind Violet-500 */
+                    #btn-two_percent.active {
+                        background-color: #8b5cf6;
+                        color: white;
+                        border-color: #8b5cf6;
+                    }
+
+                    /* ========================================== */
+                    /* Cocktail Data Theme - ROSE                 */
+                    /* ========================================== */
+                    .cocktail-theme .stat-card h4, .cocktail-theme .feature-value { color: #e11d48; } /* Tailwind Rose-600 */
+                    .cocktail-theme .feature-bar { background-color: #f43f5e; } /* Tailwind Rose-500 */
+                    #btn-cocktail.active {
+                        background-color: #f43f5e;
+                        color: white;
+                        border-color: #f43f5e;
+                    }
+                    
                     .data-view {
                         display: none;
                         animation: fadeIn 0.3s ease-in-out;
@@ -463,27 +477,80 @@
                     <h3>XGBoost Regressor Model Performance</h3>
 
                     <!-- TOGGLE BUTTONS -->
-                    <div class="toggle-container">
-                        <button id="btn-original" class="view-toggle-btn active" onclick="switchDataset('original')">Original Data Model</button>
-                        <button id="btn-synthetic" class="view-toggle-btn" onclick="switchDataset('synthetic')">Expanded (Synthetic) Data</button>
-                        <button id="btn-Broth" class="view-toggle-btn" onclick="switchDataset('Broth')">Expanded With Broth Data</button>
+                    <div class="toggle-container flex-wrap pb-4">
+                        <button id="btn-original" class="view-toggle-btn" onclick="switchDataset('original')">Original</button>
+                        <button id="btn-synthetic" class="view-toggle-btn" onclick="switchDataset('synthetic')">Synthetic</button>
+                        <button id="btn-broth" class="view-toggle-btn" onclick="switchDataset('broth')">Broth</button>
+                        <button id="btn-two_percent" class="view-toggle-btn" onclick="switchDataset('two_percent')">2% Fat</button>
+                        <button id="btn-cocktail" class="view-toggle-btn active" onclick="switchDataset('cocktail')">Cocktail</button>
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- ORIGINAL MODEL VIEW (Active by default)    -->
+                    <!-- ORIGINAL MODEL VIEW (Hidden initially)     -->
                     <!-- ========================================== -->
-                    <div id="view-original" class="data-view active-view">
+                    <div id="view-original" class="data-view">
                         <div class="stats-grid">
                             <div class="stat-card">
-                                <h4>0.3929</h4>
+                                <h4>0.5566</h4>
                                 <p>Mean Squared Error</p>
                             </div>
                             <div class="stat-card">
-                                <h4>0.9998</h4>
+                                <h4>0.9992</h4>
                                 <p>Training R² Score</p>
                             </div>
                             <div class="stat-card">
-                                <h4>0.9441</h4>
+                                <h4>0.9138</h4>
+                                <p>Testing R² Score</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-importance-section">
+                            <h4>Feature Importance (Weight)</h4>
+                            <ul class="feature-list">
+                                <li class="feature-item">
+                                    <span class="feature-name">Time (Min)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 43.8%;"></div></div>
+                                    <span class="feature-value">43.8%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Temp (°C)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 24.5%;"></div></div>
+                                    <span class="feature-value text-red-500" title="Model under-values Temp due to small dataset variance">24.5% ⚠️</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Starting Cell Count</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 15.5%;"></div></div>
+                                    <span class="feature-value">15.5%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">How Submerged</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 12.3%;"></div></div>
+                                    <span class="feature-value">12.3%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Container Material</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 4.0%;"></div></div>
+                                    <span class="feature-value">4.0%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- SYNTHETIC MODEL VIEW (Hidden initially)    -->
+                    <!-- ========================================== -->
+                    <div id="view-synthetic" class="data-view synthetic-theme">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>0.1428</h4>
+                                <p>Mean Squared Error</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9854</h4>
+                                <p>Training R² Score</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9754</h4>
                                 <p>Testing R² Score</p>
                             </div>
                         </div>
@@ -493,88 +560,37 @@
                             <ul class="feature-list">
                                 <li class="feature-item">
                                     <span class="feature-name">Time (Min)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 42.5%;"></div></div>
-                                    <span class="feature-value">42.5%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 37.8%;"></div></div>
+                                    <span class="feature-value">37.8%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Starting Cell Count</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 18.6%;"></div></div>
-                                    <span class="feature-value">18.6%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 31.4%;"></div></div>
+                                    <span class="feature-value">31.4%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Temp (°C)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 16.5%;"></div></div>
-                                    <span class="feature-value">16.5%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 16.2%;"></div></div>
+                                    <span class="feature-value">16.2%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">How Submerged</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 10.5%;"></div></div>
-                                    <span class="feature-value">10.5%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 8.7%;"></div></div>
+                                    <span class="feature-value">8.7%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Container Material</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 0.9%;"></div></div>
-                                    <span class="feature-value">0.9%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 5.9%;"></div></div>
+                                    <span class="feature-value">5.9%</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- SYNTHETIC/SIMULATED MODEL VIEW             -->
+                    <!-- BROTH MODEL VIEW (Active by default)       -->
                     <!-- ========================================== -->
-                    <div id="view-synthetic" class="data-view expanded-theme">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h4>0.2424</h4>
-                                <p>Mean Squared Error</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>0.9906</h4>
-                                <p>Training R² Score</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>0.9554</h4>
-                                <p>Testing R² Score</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-importance-section">
-                            <h4>Feature Impact (SHAP Truth Metric)</h4>
-                            <ul class="feature-list">
-                                <li class="feature-item">
-                                    <span class="feature-name">Time (Min)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 38.3%;"></div></div>
-                                    <span class="feature-value">38.3%</span>
-                                </li>
-                                <li class="feature-item">
-                                    <span class="feature-name">Starting Cell Count</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 22.9%;"></div></div>
-                                    <span class="feature-value">22.9%</span>
-                                </li>
-                                <li class="feature-item">
-                                    <span class="feature-name">Temp (°C)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 18.0%;"></div></div>
-                                    <span class="feature-value">18.0%</span>
-                                </li>
-                                <li class="feature-item">
-                                    <span class="feature-name">How Submerged</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 13.4%;"></div></div>
-                                    <span class="feature-value">13.4%</span>
-                                </li>
-                                <li class="feature-item">
-                                    <span class="feature-name">Container Material</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 7.3%;"></div></div>
-                                    <span class="feature-value">7.3%</span>
-                                </li>
-                            </ul>
-                        </div>         
-                    </div>
-
-                    <!-- ========================================== -->
-                    <!-- Synthetic Data With Broth Data Model Scores -->
-                    <!-- ========================================== -->
-                    <div id="view-Broth" class="data-view broth-theme">
+                    <div id="view-broth" class="data-view active-view broth-theme">
                         <div class="stats-grid">
                             <div class="stat-card">
                                 <h4>0.1973</h4>
@@ -595,27 +611,129 @@
                             <ul class="feature-list">
                                 <li class="feature-item">
                                     <span class="feature-name">Time (Min)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 36.7%;"></div></div>
-                                    <span class="feature-value">36.7%</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 38.5%;"></div></div>
+                                    <span class="feature-value">38.5%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Starting Cell Count</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 24.5%;"></div></div>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 31.9%;"></div></div>
                                     <span class="feature-value">31.9%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Temp (°C)</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 17.8%;"></div></div>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 20.5%;"></div></div>
                                     <span class="feature-value">20.5%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">How Submerged</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 12.9%;"></div></div>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 5.8%;"></div></div>
                                     <span class="feature-value">5.8%</span>
                                 </li>
                                 <li class="feature-item">
                                     <span class="feature-name">Container Material</span>
-                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 8.1%;"></div></div>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 3.3%;"></div></div>
+                                    <span class="feature-value">3.3%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- 2% FAT MODEL VIEW (Hidden initially)       -->
+                    <!-- ========================================== -->
+                    <div id="view-two_percent" class="data-view fat-theme">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>0.1480</h4>
+                                <p>Mean Squared Error</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9872</h4>
+                                <p>Training R² Score</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9738</h4>
+                                <p>Testing R² Score</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-importance-section">
+                            <h4>Feature Impact (SHAP Truth Metric)</h4>
+                            <ul class="feature-list">
+                                <li class="feature-item">
+                                    <span class="feature-name">Time (Min)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 38.4%;"></div></div>
+                                    <span class="feature-value">38.4%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Starting Cell Count</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 32.3%;"></div></div>
+                                    <span class="feature-value">32.3%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Temp (°C)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 21.8%;"></div></div>
+                                    <span class="feature-value">21.8%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">How Submerged</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 4.2%;"></div></div>
+                                    <span class="feature-value">4.2%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Container Material</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 3.3%;"></div></div>
+                                    <span class="feature-value">3.3%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- DATA COCKTAIL VIEW (Active by default)     -->
+                    <!-- ========================================== -->
+                    <div id="view-cocktail" class="data-view active-view cocktail-theme">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>0.1829</h4>
+                                <p>Mean Squared Error</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9873</h4>
+                                <p>Training R² Score</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>0.9652</h4>
+                                <p>Testing R² Score</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-importance-section">
+                            <h4>Feature Impact (SHAP Truth Metric)</h4>
+                            <ul class="feature-list">
+                                <li class="feature-item">
+                                    <span class="feature-name">Time (Min)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 39.4%;"></div></div>
+                                    <span class="feature-value">39.4%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Starting Cell Count</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 31.9%;"></div></div>
+                                    <span class="feature-value">31.9%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Temp (°C)</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 21.2%;"></div></div>
+                                    <span class="feature-value">21.2%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">How Submerged</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 4.2%;"></div></div>
+                                    <span class="feature-value">4.2%</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-name">Container Material</span>
+                                    <div class="feature-bar-container"><div class="feature-bar" style="width: 3.3%;"></div></div>
                                     <span class="feature-value">3.3%</span>
                                 </li>
                             </ul>
@@ -626,25 +744,15 @@
                 <script>
                     function switchDataset(datasetName) {
                         // 1. Remove active class from all buttons and views
-                        document.getElementById('btn-original').classList.remove('active');
-                        document.getElementById('btn-synthetic').classList.remove('active');
-                        document.getElementById('btn-Broth').classList.remove('active');
-                        document.getElementById('view-original').classList.remove('active-view');
-                        document.getElementById('view-synthetic').classList.remove('active-view');
-                        document.getElementById('view-Broth').classList.remove('active-view');
-
+                        const buttons = ['btn-original', 'btn-synthetic', 'btn-broth', 'btn-two_percent', 'btn-cocktail'];
+                        const views = ['view-original', 'view-synthetic', 'view-broth', 'view-two_percent', 'view-cocktail'];
+                        
+                        buttons.forEach(btn => document.getElementById(btn).classList.remove('active'));
+                        views.forEach(view => document.getElementById(view).classList.remove('active-view'));
 
                         // 2. Add active class to the clicked button and corresponding view
-                        if (datasetName === 'original') {
-                            document.getElementById('btn-original').classList.add('active');
-                            document.getElementById('view-original').classList.add('active-view');
-                        } else if (datasetName === 'synthetic') {
-                            document.getElementById('btn-synthetic').classList.add('active');
-                            document.getElementById('view-synthetic').classList.add('active-view');
-                        } else if (datasetName === 'Broth') {
-                            document.getElementById('btn-Broth').classList.add('active');
-                            document.getElementById('view-Broth').classList.add('active-view');
-                        }
+                        document.getElementById('btn-' + datasetName).classList.add('active');
+                        document.getElementById('view-' + datasetName).classList.add('active-view');
                     }
                 </script>
             </section>

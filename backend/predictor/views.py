@@ -171,7 +171,7 @@ def home(request):
                 # 5. THE SCIENTIST (EVALUATION): Did they upload the real answers?
                 deviations = None
                 if 'Cell Count(Log CFU/g)' in clean_df.columns:
-                    report_card = ml_engine.evaluate_model_accuracy(clean_df, 'Cell Count(Log CFU/g)')
+                    report_card = ml_engine.evaluate_model_accuracy(clean_df, 'Cell Count(Log CFU/g)', model_choice)
                     if report_card:
                         # Pop out the large array of deviation numbers so the report card only has the clean summary stats
                         deviations = report_card.pop("Deviation from actuals", None)

@@ -12,7 +12,7 @@ import traceback
 original_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_1.pkl')
 synthetic_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2.pkl')
 broth_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_3.pkl')
-two_percent_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_2_percent_Fat.pkl')
+two_percent_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_with_2_percent_Fat.pkl')
 data_cocktail_model_path = os.path.join(settings.BASE_DIR, 'Models', 'salmonella_xgboost_model_cocktail.pkl')
 
 model_original = None
